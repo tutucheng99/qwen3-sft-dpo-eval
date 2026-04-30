@@ -17,10 +17,21 @@ def load_cfg(path: str) -> dict:
 
 def build_tokenizer(model_id: str):
     tok = AutoTokenizer.from_pretrained(model_id, use_fast=True, trust_remote_code=True)
-    if tok.pad_token is None:
-        tok.pad_token = tok.eos_token
+    # Qwen3-Base ships with eos=<|endoftext|>. We train ChatML, so override eos
+    # to <|im_end|> — otherwise the trainer appends <|endoftext|> after our
+    # <|im_end|>-terminated examples and the model learns garbage between them.
+    tok.eos_token = "<|im_end|>"
+    tok.pad_token = "<|endoftext|>"
     tok.padding_side = "right"
     return tok
+
+
+def align_model_special_tokens(model, tok):
+    model.config.eos_token_id = tok.eos_token_id
+    model.config.pad_token_id = tok.pad_token_id
+    if getattr(model, "generation_config", None) is not None:
+        model.generation_config.eos_token_id = tok.eos_token_id
+        model.generation_config.pad_token_id = tok.pad_token_id
 
 
 def main():
@@ -40,6 +51,7 @@ def main():
         trust_remote_code=True,
     )
     model.config.use_cache = False
+    align_model_special_tokens(model, tokenizer)
 
     lora_config = LoraConfig(
         r=cfg["lora"]["r"],

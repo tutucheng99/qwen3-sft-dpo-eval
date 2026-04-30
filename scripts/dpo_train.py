@@ -17,10 +17,18 @@ def load_cfg(path: str) -> dict:
 
 def build_tokenizer(model_id: str):
     tok = AutoTokenizer.from_pretrained(model_id, use_fast=True, trust_remote_code=True)
-    if tok.pad_token is None:
-        tok.pad_token = tok.eos_token
+    tok.eos_token = "<|im_end|>"
+    tok.pad_token = "<|endoftext|>"
     tok.padding_side = "right"
     return tok
+
+
+def align_model_special_tokens(model, tok):
+    model.config.eos_token_id = tok.eos_token_id
+    model.config.pad_token_id = tok.pad_token_id
+    if getattr(model, "generation_config", None) is not None:
+        model.generation_config.eos_token_id = tok.eos_token_id
+        model.generation_config.pad_token_id = tok.pad_token_id
 
 
 def load_policy_with_sft(base_id: str, sft_adapter: str, dtype, attn):
@@ -48,6 +56,7 @@ def main():
     policy = load_policy_with_sft(
         cfg["model"]["name_or_path"], cfg["model"]["sft_adapter_path"], dtype, attn,
     )
+    align_model_special_tokens(policy, tokenizer)
 
     lora_config = LoraConfig(
         r=cfg["lora"]["r"],

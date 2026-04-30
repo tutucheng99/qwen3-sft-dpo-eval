@@ -29,10 +29,12 @@ SYSTEM_PROMPT = "你是一个有用、诚实、无害的助手。"
 
 def to_chatml(instruction: str, inp: str, output: str) -> str:
     user = f"{instruction}\n\n{inp}".strip() if inp else instruction
+    # No trailing <|im_end|>: SFTTrainer appends tokenizer.eos_token (which we
+    # override to <|im_end|>) so duplicating it here would teach a 2x EOS pattern.
     return (
         f"<|im_start|>system\n{SYSTEM_PROMPT}<|im_end|>\n"
         f"<|im_start|>user\n{user}<|im_end|>\n"
-        f"<|im_start|>assistant\n{output}<|im_end|>"
+        f"<|im_start|>assistant\n{output}"
     )
 
 
