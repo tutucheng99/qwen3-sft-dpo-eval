@@ -54,8 +54,7 @@ def main():
     eval_ds = load_dataset("json", data_files=cfg["data"]["eval_file"], split="train")
 
     sft_cfg = SFTConfig(
-        max_seq_length=cfg["data"]["max_seq_length"],
-        dataset_text_field="text",
+        max_length=cfg["data"]["max_seq_length"],
         packing=False,
         **cfg["train"],
     )
@@ -65,7 +64,7 @@ def main():
         args=sft_cfg,
         train_dataset=train_ds,
         eval_dataset=eval_ds,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         peft_config=lora_config,
     )
 

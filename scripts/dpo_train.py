@@ -79,7 +79,7 @@ def main():
         args=dpo_cfg,
         train_dataset=train_ds,
         eval_dataset=eval_ds,
-        tokenizer=tokenizer,
+        processing_class=tokenizer,
         peft_config=lora_config,
     )
 
