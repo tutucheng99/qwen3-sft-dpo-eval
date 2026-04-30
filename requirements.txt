@@ -1,0 +1,38 @@
+# Loose dependency spec. After first install on RunPod, run:
+#   pip freeze > requirements.lock.txt
+# and commit the lock file for reproducibility.
+#
+# Lower bounds reflect minimum versions known to support Qwen3 + the trl APIs
+# we use. pip is free to pick anything newer that satisfies the resolver.
+
+torch>=2.6
+transformers>=4.51
+trl>=0.13
+peft>=0.13
+accelerate>=1.0
+datasets>=3.0
+bitsandbytes>=0.45
+sentencepiece
+protobuf
+pyyaml
+
+tensorboard
+wandb
+
+# vllm intentionally NOT in this file. It pins torch tightly and will downgrade
+# the template's CUDA-aware torch. Install separately on Day 9 — see README.
+
+gradio>=5
+fastapi
+uvicorn
+
+scipy
+numpy
+pandas
+matplotlib
+seaborn
+scikit-learn
+
+openai
+tiktoken
+# flash-attn is installed separately; see README.

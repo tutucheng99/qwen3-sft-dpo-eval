@@ -1,0 +1,35 @@
+# NOT ignored: requirements.lock.txt (commit it for reproducibility)
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.env
+
+checkpoints/
+outputs/
+runs/
+wandb/
+*.bin
+*.safetensors
+
+data/raw/
+data/processed/
+
+.DS_Store
+.ipynb_checkpoints/
+
+# Claude Code session/local config
+.claude/
+
+# never commit private keys / secrets
+key
+key.*
+*.pem
+id_*
+*_rsa
+*_ed25519
+.env
+.env.*
+!.env.example
+
