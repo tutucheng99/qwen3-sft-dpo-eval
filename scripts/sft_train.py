@@ -35,7 +35,7 @@ def main():
 
     model = AutoModelForCausalLM.from_pretrained(
         cfg["model"]["name_or_path"],
-        torch_dtype=getattr(torch, cfg["model"]["torch_dtype"]),
+        dtype=getattr(torch, cfg["model"]["dtype"]),
         attn_implementation=cfg["model"].get("attn_implementation", "sdpa"),
         trust_remote_code=True,
     )

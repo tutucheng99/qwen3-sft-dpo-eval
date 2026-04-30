@@ -25,7 +25,7 @@ def build_tokenizer(model_id: str):
 
 def load_policy_with_sft(base_id: str, sft_adapter: str, dtype, attn):
     base = AutoModelForCausalLM.from_pretrained(
-        base_id, torch_dtype=dtype, attn_implementation=attn, trust_remote_code=True,
+        base_id, dtype=dtype, attn_implementation=attn, trust_remote_code=True,
     )
     merged = PeftModel.from_pretrained(base, sft_adapter).merge_and_unload()
     merged.config.use_cache = False
@@ -40,7 +40,7 @@ def main():
     cfg = load_cfg(args.config)
     Path(cfg["train"]["output_dir"]).mkdir(parents=True, exist_ok=True)
 
-    dtype = getattr(torch, cfg["model"]["torch_dtype"])
+    dtype = getattr(torch, cfg["model"]["dtype"])
     attn = cfg["model"].get("attn_implementation", "sdpa")
 
     tokenizer = build_tokenizer(cfg["model"]["name_or_path"])

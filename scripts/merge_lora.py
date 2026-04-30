@@ -19,7 +19,7 @@ def main():
     Path(args.out).mkdir(parents=True, exist_ok=True)
 
     model = AutoModelForCausalLM.from_pretrained(
-        args.base, torch_dtype=torch.bfloat16, trust_remote_code=True,
+        args.base, dtype=torch.bfloat16, trust_remote_code=True,
     )
 
     if args.stack == "sft+dpo":

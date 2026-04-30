@@ -17,9 +17,11 @@ SUBSET_QUOTAS = {
     "wiki": 800,
     "human_value": 600,
     "logi_qa": 500,
-    "chatgpt": 1500,
     "wikihow": 800,
-    "douban": 500,
+    "douban": 400,
+    "coig_pc": 1200,
+    "segmentfault": 600,
+    "finance": 400,
 }
 
 SYSTEM_PROMPT = "你是一个有用、诚实、无害的助手。"

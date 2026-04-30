@@ -1,7 +1,7 @@
 model:
   name_or_path: Qwen/Qwen3-8B-Base
   sft_adapter_path: checkpoints/sft
-  torch_dtype: bfloat16
+  dtype: bfloat16
   attn_implementation: flash_attention_2
 
 data:
