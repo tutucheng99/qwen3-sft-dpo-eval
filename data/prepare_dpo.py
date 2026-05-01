@@ -18,9 +18,9 @@ def fmt_prompt(user_msg: str) -> str:
 
 
 def fmt_response(text: str) -> str:
-    # No trailing <|im_end|>: DPOTrainer appends tokenizer.eos_token (which we
-    # override to <|im_end|> in dpo_train.py).
-    return text
+    # Explicit <|im_end|> — DPOTrainer's auto-EOS append still gives us
+    # <|endoftext|> after ours. Same reasoning as prepare_sft.py.
+    return f"{text}<|im_end|>"
 
 
 def extract_pair(row: dict) -> tuple[str, str, str] | None:
