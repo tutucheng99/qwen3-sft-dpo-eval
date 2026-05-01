@@ -15,12 +15,12 @@ SYSTEM = "你是一个有用、诚实、无害的助手。"
 
 
 def chat_fn(message: str, history: list, vllm_url: str, temperature: float, max_tokens: int) -> str:
+    """history is in Gradio 'messages' format: list of {role, content}."""
     client = OpenAI(base_url=vllm_url, api_key="dummy")
     messages = [{"role": "system", "content": SYSTEM}]
-    for user, assistant in history:
-        messages.append({"role": "user", "content": user})
-        if assistant:
-            messages.append({"role": "assistant", "content": assistant})
+    for h in history:
+        if isinstance(h, dict):
+            messages.append({"role": h["role"], "content": h["content"]})
     messages.append({"role": "user", "content": message})
 
     try:
@@ -43,7 +43,7 @@ def build_app(vllm_url: str):
 
         with gr.Row():
             with gr.Column(scale=4):
-                chatbot = gr.Chatbot(height=500, label="对话")
+                chatbot = gr.Chatbot(height=500, label="对话", type="messages")
                 msg = gr.Textbox(placeholder="输入消息,回车发送...", show_label=False)
             with gr.Column(scale=1):
                 temperature = gr.Slider(0.0, 1.5, value=0.7, step=0.1, label="Temperature")
@@ -52,7 +52,10 @@ def build_app(vllm_url: str):
 
         def respond(message, history, t, mt):
             reply = chat_fn(message, history, vllm_url, t, mt)
-            history = history + [(message, reply)]
+            history = history + [
+                {"role": "user", "content": message},
+                {"role": "assistant", "content": reply},
+            ]
             return "", history
 
         msg.submit(respond, [msg, chatbot, temperature, max_tokens], [msg, chatbot])
