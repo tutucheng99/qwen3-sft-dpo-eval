@@ -55,7 +55,7 @@ def main():
 
     demo = gr.ChatInterface(
         fn=chat,
-        type="messages",
+        chatbot=gr.Chatbot(type="messages", height=500),
         title="Qwen3-8B-Base → SFT (COIG-CQIA) → DPO (UltraFeedback-zh)",
         description="中文对话助手 demo · 详细评估见 [GitHub repo](https://github.com/tutucheng99/qwen3-sft-dpo-eval)",
     )
