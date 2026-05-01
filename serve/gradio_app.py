@@ -57,9 +57,7 @@ def main():
         fn=chat,
         type="messages",
         title="Qwen3-8B-Base → SFT (COIG-CQIA) → DPO (UltraFeedback-zh)",
-        description="中文对话助手 demo · 后端是 transformers + FastAPI(serve/hf_serve.py)· 详细评估见 [GitHub repo](https://github.com/tutucheng99/qwen3-sft-dpo-eval)",
-        examples=EXAMPLES,
-        cache_examples=False,
+        description="中文对话助手 demo · 详细评估见 [GitHub repo](https://github.com/tutucheng99/qwen3-sft-dpo-eval)",
     )
     demo.launch(server_name="0.0.0.0", server_port=args.port, share=args.share)
 
