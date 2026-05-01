@@ -12,6 +12,7 @@ Run from the training venv:
   python serve/hf_serve.py --model /workspace/merged/dpo --port 8000
 """
 import argparse
+import re
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -22,6 +23,21 @@ import uvicorn
 from fastapi import FastAPI
 from pydantic import BaseModel
 from transformers import AutoModelForCausalLM, AutoTokenizer
+
+# Trailing junk filter: keeps Chinese (CJK), Latin letters/digits, common
+# punctuation, whitespace; strips trailing rest. Workaround for the trl 1.x
+# EOS-not-learned bug — the model often emits 1-3 low-frequency tokens (Thai,
+# Cyrillic, replacement chars) right before <|im_end|>.
+_TAIL_KEEP = re.compile(
+    r"[一-鿿　-〿＀-￯A-Za-z0-9\s.,!?;:'\"\-—…“”‘’()\[\]{}<>=+*/\\|`~@#$%^&_·。!?,、;:《》【】（）·\n\r\t]"
+)
+
+
+def clean_trailing(text: str) -> str:
+    """Strip trailing characters outside the keep-set, repeatedly."""
+    while text and not _TAIL_KEEP.match(text[-1]):
+        text = text[:-1]
+    return text.rstrip()
 
 MODEL = None
 TOK = None
@@ -101,6 +117,7 @@ def chat(req: ChatRequest):
         )
     decoded = TOK.decode(out[0][ids.input_ids.shape[1]:], skip_special_tokens=False)
     response = decoded.split("<|im_end|>")[0].split("<|endoftext|>")[0].strip()
+    response = clean_trailing(response)
 
     return {
         "id": f"chatcmpl-{uuid.uuid4().hex[:24]}",
