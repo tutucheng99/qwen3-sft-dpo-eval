@@ -36,9 +36,7 @@ def gen(model, tok, text: str, eos_ids: list[int], max_new: int = 400) -> str:
         out = model.generate(
             **ids,
             max_new_tokens=max_new,
-            do_sample=True,
-            temperature=0.7,
-            top_p=0.9,
+            do_sample=False,
             pad_token_id=tok.convert_tokens_to_ids("<|endoftext|>"),
             eos_token_id=eos_ids,
         )
