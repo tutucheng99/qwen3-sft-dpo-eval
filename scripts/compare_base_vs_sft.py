@@ -30,7 +30,7 @@ def fmt(prompt: str) -> str:
     )
 
 
-def gen(model, tok, text: str, max_new: int = 400) -> str:
+def gen(model, tok, text: str, eos_ids: list[int], max_new: int = 400) -> str:
     ids = tok(text, return_tensors="pt").to(model.device)
     with torch.no_grad():
         out = model.generate(
@@ -39,10 +39,11 @@ def gen(model, tok, text: str, max_new: int = 400) -> str:
             do_sample=True,
             temperature=0.7,
             top_p=0.9,
-            pad_token_id=tok.eos_token_id,
+            pad_token_id=tok.convert_tokens_to_ids("<|endoftext|>"),
+            eos_token_id=eos_ids,
         )
     decoded = tok.decode(out[0][ids["input_ids"].shape[1]:], skip_special_tokens=False)
-    return decoded.split("<|im_end|>")[0].strip()
+    return decoded.split("<|im_end|>")[0].split("<|endoftext|>")[0].strip()
 
 
 def main():
@@ -52,8 +53,10 @@ def main():
     args = ap.parse_args()
 
     tok = AutoTokenizer.from_pretrained(args.base, trust_remote_code=True)
-    if tok.pad_token is None:
-        tok.pad_token = tok.eos_token
+    im_end_id = tok.convert_tokens_to_ids("<|im_end|>")
+    eot_id = tok.convert_tokens_to_ids("<|endoftext|>")
+    eos_ids = [im_end_id, eot_id]
+    tok.pad_token = "<|endoftext|>"
 
     print("Loading base model on GPU...")
     base = AutoModelForCausalLM.from_pretrained(
@@ -71,10 +74,10 @@ def main():
         print("=" * 90)
         print(f"[{i}/{len(TEST_PROMPTS)}] PROMPT: {p}")
         print("-" * 38 + " SFT " + "-" * 38)
-        print(gen(model, tok, text))
+        print(gen(model, tok, text, eos_ids))
         with model.disable_adapter():
             print("-" * 38 + " BASE " + "-" * 38)
-            print(gen(model, tok, text))
+            print(gen(model, tok, text, eos_ids))
         print()
 
 
