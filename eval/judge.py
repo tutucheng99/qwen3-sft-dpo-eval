@@ -1,13 +1,15 @@
-"""Pairwise judge over (BASE, SFT, DPO) using OpenAI GPT-4 as the arbiter.
+"""Pairwise judge over (BASE, SFT, DPO) using either GPT-4o or Claude as arbiter.
 
-For each prompt and each ordered pair (A, B), we ask GPT-4 to pick which
-response is better. To remove position bias we run BOTH (A,B) and (B,A),
-treating disagreement as a tie. Results saved to eval/results/judge.jsonl.
+For each prompt and each ordered pair (A, B), asks the judge to pick which
+response is better. To remove position bias we run BOTH (A,B) and (B,A) —
+disagreement on flip = TIE. Saves to eval/results/judge.jsonl.
 
-Pairs evaluated:
-- (base, sft)   — does SFT improve over base?
-- (sft, dpo)    — does DPO improve over SFT?
-- (base, dpo)   — full-stack improvement
+Usage:
+    OPENAI_API_KEY=sk-...  python eval/judge.py --provider openai
+    ANTHROPIC_API_KEY=sk-... python eval/judge.py --provider anthropic
+
+Pairs evaluated: (base,sft), (sft,dpo), (base,dpo).
+Cost: ~240 calls. ~$0.72 on gpt-4o, ~$1.20 on claude-sonnet-4-5.
 """
 import argparse
 import json
@@ -17,11 +19,8 @@ import sys
 import time
 from pathlib import Path
 
-from openai import OpenAI
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-JUDGE_MODEL = "gpt-4o-2024-08-06"
 PAIRS = [("base", "sft"), ("sft", "dpo"), ("base", "dpo")]
 
 JUDGE_PROMPT = """你是一位严谨的评审员,需要比较两个 AI 助手对同一个用户问题的回答质量。
@@ -49,7 +48,6 @@ TIE"""
 
 
 def parse_verdict(text: str) -> str:
-    """Pick the first standalone A/B/TIE token."""
     text = text.strip().upper()
     m = re.match(r"^(TIE|A|B)\b", text)
     if m:
@@ -63,17 +61,42 @@ def parse_verdict(text: str) -> str:
     return "TIE"
 
 
-def judge_once(client, prompt: str, resp_a: str, resp_b: str) -> tuple[str, str]:
+class OpenAIJudge:
+    def __init__(self, model: str = "gpt-4o-2024-08-06"):
+        from openai import OpenAI
+        self.client = OpenAI()
+        self.model = model
+
+    def __call__(self, msg: str) -> str:
+        r = self.client.chat.completions.create(
+            model=self.model,
+            messages=[{"role": "user", "content": msg}],
+            temperature=0,
+            max_tokens=10,
+        )
+        return r.choices[0].message.content
+
+
+class AnthropicJudge:
+    def __init__(self, model: str = "claude-sonnet-4-5"):
+        from anthropic import Anthropic
+        self.client = Anthropic()
+        self.model = model
+
+    def __call__(self, msg: str) -> str:
+        r = self.client.messages.create(
+            model=self.model,
+            max_tokens=10,
+            messages=[{"role": "user", "content": msg}],
+        )
+        return r.content[0].text
+
+
+def judge_once(judge, prompt, resp_a, resp_b):
     msg = JUDGE_PROMPT.format(prompt=prompt, response_a=resp_a, response_b=resp_b)
     for attempt in range(3):
         try:
-            r = client.chat.completions.create(
-                model=JUDGE_MODEL,
-                messages=[{"role": "user", "content": msg}],
-                temperature=0,
-                max_tokens=10,
-            )
-            raw = r.choices[0].message.content
+            raw = judge(msg)
             return parse_verdict(raw), raw
         except Exception as e:
             print(f"  [retry {attempt+1}] {e}")
@@ -83,14 +106,19 @@ def judge_once(client, prompt: str, resp_a: str, resp_b: str) -> tuple[str, str]
 
 def main():
     ap = argparse.ArgumentParser()
+    ap.add_argument("--provider", choices=["openai", "anthropic"], default="openai")
     ap.add_argument("--gen", default="eval/results/generations.jsonl")
     ap.add_argument("--out", default="eval/results/judge.jsonl")
     args = ap.parse_args()
 
-    api_key = os.environ.get("OPENAI_API_KEY")
-    if not api_key:
-        sys.exit("set OPENAI_API_KEY")
-    client = OpenAI(api_key=api_key)
+    if args.provider == "openai":
+        if not os.environ.get("OPENAI_API_KEY"):
+            sys.exit("set OPENAI_API_KEY")
+        judge = OpenAIJudge()
+    else:
+        if not os.environ.get("ANTHROPIC_API_KEY"):
+            sys.exit("set ANTHROPIC_API_KEY")
+        judge = AnthropicJudge()
 
     gens = [json.loads(l) for l in open(args.gen, encoding="utf-8")]
     by = {(g["id"], g["model"]): g for g in gens}
@@ -100,24 +128,19 @@ def main():
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_f = out_path.open("w", encoding="utf-8")
 
-    n_total = len(prompts) * len(PAIRS) * 2  # both orders
+    n_total = len(prompts) * len(PAIRS) * 2
     done = 0
     for pid, cat, prompt in prompts:
         for a_name, b_name in PAIRS:
             resp_a = by[(pid, a_name)]["response"]
             resp_b = by[(pid, b_name)]["response"]
 
-            v_ab, raw_ab = judge_once(client, prompt, resp_a, resp_b)
-            v_ba, raw_ba = judge_once(client, prompt, resp_b, resp_a)
+            v_ab, _ = judge_once(judge, prompt, resp_a, resp_b)
+            v_ba, _ = judge_once(judge, prompt, resp_b, resp_a)
             done += 2
 
-            # Resolve order-bias: convert ba verdict back to a/b orientation
             v_ba_flipped = {"A": "B", "B": "A", "TIE": "TIE"}[v_ba]
-
-            if v_ab == v_ba_flipped:
-                final = v_ab
-            else:
-                final = "TIE"
+            final = v_ab if v_ab == v_ba_flipped else "TIE"
 
             rec = {
                 "id": pid, "category": cat, "prompt": prompt,
