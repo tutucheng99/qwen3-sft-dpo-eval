@@ -25,25 +25,10 @@ def fmt_response(text: str) -> str:
 
 def extract_pair(row: dict) -> tuple[str, str, str] | None:
     instr = (row.get("instruction") or row.get("prompt") or "").strip()
-    if not instr:
+    chosen = (row.get("chosen_response") or row.get("chosen") or "").strip()
+    rejected = (row.get("rejected_response") or row.get("rejected") or "").strip()
+    if not instr or not chosen or not rejected or chosen == rejected:
         return None
-    completions = row.get("completions") or row.get("responses") or []
-    if completions and isinstance(completions, list) and isinstance(completions[0], dict):
-        scored = [(c.get("overall_score") or c.get("score") or 0, c.get("response") or c.get("text") or "")
-                  for c in completions if (c.get("response") or c.get("text"))]
-        scored = [(s, t) for s, t in scored if t.strip()]
-        if len(scored) < 2:
-            return None
-        scored.sort(key=lambda x: x[0])
-        rejected = scored[0][1].strip()
-        chosen = scored[-1][1].strip()
-        if scored[-1][0] - scored[0][0] < 1:
-            return None
-    else:
-        chosen = (row.get("chosen") or "").strip()
-        rejected = (row.get("rejected") or "").strip()
-        if not chosen or not rejected or chosen == rejected:
-            return None
     return instr, chosen, rejected
 
 
@@ -61,7 +46,13 @@ def main():
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    ds = load_dataset("opencsg/UltraFeedback-chinese", split="train")
+    # Repo has 3 parquets with mismatched schemas; load only the binarized
+    # variant (already chosen_response / rejected_response paired).
+    ds = load_dataset(
+        "opencsg/UltraFeedback-chinese",
+        data_files="ultrafeedback_zh_binarized_random.parquet",
+        split="train",
+    )
     print(f"loaded {len(ds)} raw rows")
 
     samples: list[dict] = []
