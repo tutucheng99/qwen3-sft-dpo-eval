@@ -15,6 +15,7 @@ wandb/
 
 data/raw/
 data/processed/
+eval/results/
 
 .DS_Store
 .ipynb_checkpoints/
