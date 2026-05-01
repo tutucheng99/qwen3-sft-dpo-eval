@@ -68,7 +68,6 @@ def main():
     dpo_cfg = DPOConfig(
         beta=beta,
         loss_type=loss_type,
-        max_prompt_length=cfg["data"]["max_prompt_length"],
         max_length=cfg["data"]["max_length"],
         **train_kwargs,
     )
