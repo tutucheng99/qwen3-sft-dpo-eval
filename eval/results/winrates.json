@@ -1,0 +1,291 @@
+{
+  "overall": {
+    "base_vs_dpo": {
+      "n": 40,
+      "winrate_A": 0.5375,
+      "ci_low": 0.4375,
+      "ci_high": 0.65,
+      "n_A_wins": 11,
+      "n_B_wins": 8,
+      "n_ties": 21
+    },
+    "base_vs_sft": {
+      "n": 40,
+      "winrate_A": 0.7,
+      "ci_low": 0.6,
+      "ci_high": 0.8,
+      "n_A_wins": 20,
+      "n_B_wins": 4,
+      "n_ties": 16
+    },
+    "sft_vs_dpo": {
+      "n": 40,
+      "winrate_A": 0.375,
+      "ci_low": 0.2875,
+      "ci_high": 0.4625,
+      "n_A_wins": 3,
+      "n_B_wins": 13,
+      "n_ties": 24
+    }
+  },
+  "by_category": {
+    "base_vs_dpo": {
+      "code": {
+        "n": 4,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "common": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "concise": {
+        "n": 2,
+        "winrate_A": 0.75,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "context": {
+        "n": 2,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "creative": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "edge": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "explain": {
+        "n": 4,
+        "winrate_A": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0
+      },
+      "format": {
+        "n": 2,
+        "winrate_A": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0
+      },
+      "knowledge": {
+        "n": 3,
+        "winrate_A": 0.16666666666666666,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "math": {
+        "n": 2,
+        "winrate_A": 0.75,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "reason": {
+        "n": 3,
+        "winrate_A": 0.3333333333333333,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "safety": {
+        "n": 3,
+        "winrate_A": 0.16666666666666666,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "task": {
+        "n": 3,
+        "winrate_A": 0.3333333333333333,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "translate": {
+        "n": 3,
+        "winrate_A": 0.6666666666666666,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      }
+    },
+    "base_vs_sft": {
+      "code": {
+        "n": 4,
+        "winrate_A": 0.625,
+        "ci_low": 0.5,
+        "ci_high": 0.875
+      },
+      "common": {
+        "n": 3,
+        "winrate_A": 0.6666666666666666,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "concise": {
+        "n": 2,
+        "winrate_A": 0.75,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "context": {
+        "n": 2,
+        "winrate_A": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0
+      },
+      "creative": {
+        "n": 3,
+        "winrate_A": 0.8333333333333334,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "edge": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "explain": {
+        "n": 4,
+        "winrate_A": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0
+      },
+      "format": {
+        "n": 2,
+        "winrate_A": 1.0,
+        "ci_low": 1.0,
+        "ci_high": 1.0
+      },
+      "knowledge": {
+        "n": 3,
+        "winrate_A": 0.6666666666666666,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "math": {
+        "n": 2,
+        "winrate_A": 0.25,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "reason": {
+        "n": 3,
+        "winrate_A": 0.6666666666666666,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "safety": {
+        "n": 3,
+        "winrate_A": 0.6666666666666666,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "task": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "translate": {
+        "n": 3,
+        "winrate_A": 0.6666666666666666,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      }
+    },
+    "sft_vs_dpo": {
+      "code": {
+        "n": 4,
+        "winrate_A": 0.375,
+        "ci_low": 0.125,
+        "ci_high": 0.5
+      },
+      "common": {
+        "n": 3,
+        "winrate_A": 0.16666666666666666,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "concise": {
+        "n": 2,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "context": {
+        "n": 2,
+        "winrate_A": 0.0,
+        "ci_low": 0.0,
+        "ci_high": 0.0
+      },
+      "creative": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "edge": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "explain": {
+        "n": 4,
+        "winrate_A": 0.375,
+        "ci_low": 0.125,
+        "ci_high": 0.5
+      },
+      "format": {
+        "n": 2,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      },
+      "knowledge": {
+        "n": 3,
+        "winrate_A": 0.3333333333333333,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "math": {
+        "n": 2,
+        "winrate_A": 0.75,
+        "ci_low": 0.5,
+        "ci_high": 1.0
+      },
+      "reason": {
+        "n": 3,
+        "winrate_A": 0.3333333333333333,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "safety": {
+        "n": 3,
+        "winrate_A": 0.3333333333333333,
+        "ci_low": 0.0,
+        "ci_high": 1.0
+      },
+      "task": {
+        "n": 3,
+        "winrate_A": 0.16666666666666666,
+        "ci_low": 0.0,
+        "ci_high": 0.5
+      },
+      "translate": {
+        "n": 3,
+        "winrate_A": 0.5,
+        "ci_low": 0.5,
+        "ci_high": 0.5
+      }
+    }
+  }
+}

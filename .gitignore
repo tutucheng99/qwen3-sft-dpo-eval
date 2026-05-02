@@ -15,7 +15,7 @@ wandb/
 
 data/raw/
 data/processed/
-eval/results/
+# eval/results/ — kept in repo so reviewers can re-plot / re-analyze without rerunning
 
 .DS_Store
 .ipynb_checkpoints/
