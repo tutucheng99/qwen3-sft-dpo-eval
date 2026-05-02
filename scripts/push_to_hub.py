@@ -160,11 +160,24 @@ def push_one(api: HfApi, local_dir: Path, repo_id: str, card: str, token: str):
     card_path = local_dir / "README.md"
     card_path.write_text(card, encoding="utf-8")
 
+    # Only the adapter + tokenizer + card. Skip checkpoint-*, optimizer states,
+    # tensorboard runs, training_args.bin — they bloat the repo without value.
     upload_folder(
         folder_path=str(local_dir),
         repo_id=repo_id,
         token=token,
-        commit_message="Initial upload of LoRA adapter + model card",
+        commit_message="Upload LoRA adapter + model card",
+        allow_patterns=[
+            "README.md",
+            "adapter_config.json",
+            "adapter_model.safetensors",
+            "tokenizer*.json",
+            "tokenizer_config.json",
+            "special_tokens_map.json",
+            "chat_template.jinja",
+            "vocab.txt",
+            "merges.txt",
+        ],
     )
     print(f"  → https://huggingface.co/{repo_id}")
 
