@@ -5,6 +5,10 @@
 
 10-day portfolio project on RunPod B200. Full technical writeup: **[docs/REPORT.md](docs/REPORT.md)**.
 
+**Trained adapters on HuggingFace Hub:**
+- [`JeffCheng12138/qwen3-8b-sft-coig-cqia`](https://huggingface.co/JeffCheng12138/qwen3-8b-sft-coig-cqia) — SFT LoRA
+- [`JeffCheng12138/qwen3-8b-dpo-ultrafeedback-zh`](https://huggingface.co/JeffCheng12138/qwen3-8b-dpo-ultrafeedback-zh) — DPO LoRA (recommended)
+
 ---
 
 ## TL;DR — three findings most reports would miss
