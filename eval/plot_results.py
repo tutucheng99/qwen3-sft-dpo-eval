@@ -30,7 +30,7 @@ plt.rcParams.update({
 
 def parse_dpo_log(log_path: Path) -> dict:
     """Pull (step, loss, margins, accuracies) tuples from training log."""
-    text = log_path.read_text(errors="ignore") if log_path.exists() else ""
+    text = log_path.read_text(encoding="utf-8", errors="ignore") if log_path.exists() else ""
     rows = []
     for m in re.finditer(
         r"\{'loss': '([^']+)', 'grad_norm': '[^']+', 'learning_rate': '[^']+', "
@@ -82,7 +82,7 @@ def fig_dpo_training(rows, out: Path):
 
 
 def fig_winrates_ci(winrates_path: Path, out: Path):
-    data = json.loads(winrates_path.read_text())["overall"]
+    data = json.loads(winrates_path.read_text(encoding="utf-8"))["overall"]
     pairs = [
         ("base_vs_sft", "BASE > SFT", "SFT"),
         ("sft_vs_dpo", "SFT > DPO", "DPO"),
@@ -108,8 +108,9 @@ def fig_winrates_ci(winrates_path: Path, out: Path):
     ax.set_xlabel("Win rate of model A (95% bootstrap CI, n=40 each)")
     ax.set_title("Pairwise win rates judged by DeepSeek-chat")
     for i, (m, l, h) in enumerate(zip(means, lows, highs)):
-        ax.text(m + 0.02, i, f"{m:.3f} [{l:.3f}, {h:.3f}]",
-                va="center", fontsize=10)
+        ax.text(h + 0.02, i, f"{m:.3f} [{l:.3f}, {h:.3f}]",
+                va="center", fontsize=10,
+                bbox=dict(facecolor="white", edgecolor="none", pad=1.5))
     ax.invert_yaxis()
     plt.tight_layout()
     plt.savefig(out, bbox_inches="tight")
@@ -118,7 +119,7 @@ def fig_winrates_ci(winrates_path: Path, out: Path):
 
 
 def fig_dimension_shift(dim_path: Path, out: Path):
-    results = json.loads(dim_path.read_text())
+    results = json.loads(dim_path.read_text(encoding="utf-8"))
     from collections import defaultdict
     by = defaultdict(list)
     for r in results:
@@ -153,7 +154,7 @@ def fig_dimension_shift(dim_path: Path, out: Path):
     ax.set_xticklabels([labels[a] for a in axes_list])
     ax.set_ylabel("Δ avg log-probability of reference response")
     ax.set_title("Dimension attribution: how SFT/DPO shift conditional preference")
-    ax.legend(loc="lower right")
+    ax.legend(loc="upper center", ncol=3)
     ax.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     plt.savefig(out, bbox_inches="tight")
@@ -162,7 +163,7 @@ def fig_dimension_shift(dim_path: Path, out: Path):
 
 
 def fig_jsd(jsd_path: Path, out: Path):
-    data = json.loads(jsd_path.read_text())
+    data = json.loads(jsd_path.read_text(encoding="utf-8"))
     pairs = list(data["overall"].keys())
     overall_means = [data["overall"][p]["mean"] for p in pairs]
     overall_stds = [data["overall"][p]["std"] for p in pairs]
